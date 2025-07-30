@@ -1,36 +1,27 @@
 import { Star, Eye, Heart, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Review } from "@/data/reviews";
 
 interface ReviewCardProps {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  category: string;
-  rating: number;
-  views: string;
-  likes: string;
-  author: string;
-  timeAgo: string;
-  isFeatured?: boolean;
-  productLink?: string;
+  review: Review;
 }
 
-const ReviewCard = ({
-  id,
-  title,
-  description,
-  image,
-  category,
-  rating,
-  views,
-  likes,
-  author,
-  timeAgo,
-  isFeatured = false,
-  productLink
-}: ReviewCardProps) => {
+const ReviewCard = ({ review }: ReviewCardProps) => {
+  const {
+    id,
+    title,
+    description,
+    image,
+    category,
+    rating,
+    views,
+    likes,
+    author,
+    timeAgo,
+    isFeatured = false,
+    productLink
+  } = review;
   return (
     <div className="bg-card rounded-lg shadow-review-card border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
       {/* Image Container */}

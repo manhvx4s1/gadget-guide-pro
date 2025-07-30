@@ -11,10 +11,13 @@ import { Trash2, Edit, Plus, Save, X } from "lucide-react";
 import { reviews, Review } from "@/data/reviews";
 
 const Admin = () => {
-  const [categories] = useState(["Điện thoại", "Laptop", "Smart Home"]);
+  const [categories, setCategories] = useState(["Điện thoại", "Laptop", "Smart Home"]);
   const [reviewList, setReviewList] = useState<Review[]>(reviews);
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [editingCategoryIndex, setEditingCategoryIndex] = useState<number | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -91,8 +94,47 @@ const Admin = () => {
     });
   };
 
-  const handleDelete = (id: string) => {
+  const handleDeleteReview = (id: string) => {
     setReviewList(reviewList.filter(review => review.id !== id));
+  };
+
+  // Category management functions
+  const handleCreateCategory = () => {
+    setIsCreatingCategory(true);
+    setNewCategoryName("");
+  };
+
+  const handleEditCategory = (index: number) => {
+    setEditingCategoryIndex(index);
+    setNewCategoryName(categories[index]);
+  };
+
+  const handleSaveCategory = () => {
+    if (isCreatingCategory) {
+      setCategories([...categories, newCategoryName]);
+    } else if (editingCategoryIndex !== null) {
+      const updatedCategories = [...categories];
+      updatedCategories[editingCategoryIndex] = newCategoryName;
+      setCategories(updatedCategories);
+    }
+    handleCancelCategory();
+  };
+
+  const handleCancelCategory = () => {
+    setIsCreatingCategory(false);
+    setEditingCategoryIndex(null);
+    setNewCategoryName("");
+  };
+
+  const handleDeleteCategory = (index: number) => {
+    const categoryToDelete = categories[index];
+    // Check if category is being used in reviews
+    const reviewsUsingCategory = reviewList.filter(review => review.category === categoryToDelete);
+    if (reviewsUsingCategory.length > 0) {
+      alert(`Không thể xóa danh mục "${categoryToDelete}" vì có ${reviewsUsingCategory.length} bài viết đang sử dụng.`);
+      return;
+    }
+    setCategories(categories.filter((_, i) => i !== index));
   };
 
   return (
@@ -266,7 +308,7 @@ const Admin = () => {
                           Sửa
                         </Button>
                         <Button
-                          onClick={() => handleDelete(review.id)}
+                          onClick={() => handleDeleteReview(review.id)}
                           variant="destructive"
                           size="sm"
                           className="gap-2"
@@ -286,11 +328,43 @@ const Admin = () => {
           <TabsContent value="categories" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-semibold">Danh mục sản phẩm</h2>
-              <Button className="gap-2">
+              <Button onClick={handleCreateCategory} className="gap-2">
                 <Plus className="h-4 w-4" />
                 Thêm danh mục
               </Button>
             </div>
+
+            {/* Form tạo/sửa danh mục */}
+            {(isCreatingCategory || editingCategoryIndex !== null) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {isCreatingCategory ? "Thêm danh mục mới" : "Chỉnh sửa danh mục"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="categoryName">Tên danh mục</Label>
+                    <Input
+                      id="categoryName"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      placeholder="Nhập tên danh mục"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={handleSaveCategory} className="gap-2">
+                      <Save className="h-4 w-4" />
+                      Lưu
+                    </Button>
+                    <Button onClick={handleCancelCategory} variant="outline" className="gap-2">
+                      <X className="h-4 w-4" />
+                      Hủy
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             <div className="grid gap-4">
               {categories.map((category, index) => (
@@ -304,11 +378,21 @@ const Admin = () => {
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="gap-2">
+                        <Button 
+                          onClick={() => handleEditCategory(index)}
+                          variant="outline" 
+                          size="sm" 
+                          className="gap-2"
+                        >
                           <Edit className="h-4 w-4" />
                           Sửa
                         </Button>
-                        <Button variant="destructive" size="sm" className="gap-2">
+                        <Button 
+                          onClick={() => handleDeleteCategory(index)}
+                          variant="destructive" 
+                          size="sm" 
+                          className="gap-2"
+                        >
                           <Trash2 className="h-4 w-4" />
                           Xóa
                         </Button>

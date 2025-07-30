@@ -27,7 +27,7 @@ const Index = () => {
             <h2 className="text-2xl font-bold text-foreground mb-6">Bài viết nổi bật</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredReviews.map((review) => (
-                <ReviewCard key={review.id} {...review} />
+                <ReviewCard key={review.id} review={review} />
               ))}
             </div>
           </section>
@@ -38,7 +38,7 @@ const Index = () => {
           <h2 className="text-2xl font-bold text-foreground mb-6">Tất cả bài viết</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allReviews.map((review) => (
-              <ReviewCard key={review.id} {...review} />
+              <ReviewCard key={review.id} review={review} />
             ))}
           </div>
         </section>
