@@ -32,10 +32,24 @@ const Header = () => {
                 key={category.name}
                 href={category.href}
                 className="text-foreground hover:text-primary transition-colors font-medium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = category.href;
+                }}
               >
                 {category.name}
               </a>
             ))}
+            <a
+              href="/admin"
+              className="text-foreground hover:text-primary transition-colors font-medium"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = "/admin";
+              }}
+            >
+              Quản trị
+            </a>
           </nav>
 
           {/* Search Bar */}
@@ -72,11 +86,26 @@ const Header = () => {
                   key={category.name}
                   href={category.href}
                   className="text-foreground hover:text-primary transition-colors font-medium"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsMenuOpen(false);
+                    window.location.href = category.href;
+                  }}
                 >
                   {category.name}
                 </a>
               ))}
+              <a
+                href="/admin"
+                className="text-foreground hover:text-primary transition-colors font-medium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsMenuOpen(false);
+                  window.location.href = "/admin";
+                }}
+              >
+                Quản trị
+              </a>
             </nav>
             
             {/* Mobile Search */}
