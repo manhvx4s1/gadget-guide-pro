@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ReviewDetail from "./pages/ReviewDetail";
 import Admin from "./pages/Admin";
+import ArticleEditor from "./pages/ArticleEditor";
+import CategoryManager from "./pages/CategoryManager";
 import Phones from "./pages/Phones";
 import Laptops from "./pages/Laptops";
 import SmartHome from "./pages/SmartHome";
@@ -23,6 +25,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/review/:id" element={<ReviewDetail />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/article-editor" element={<ArticleEditor />} />
+          <Route path="/admin/article-editor/:id" element={<ArticleEditor />} />
+          <Route path="/admin/categories" element={<CategoryManager />} />
           <Route path="/phones" element={<Phones />} />
           <Route path="/laptops" element={<Laptops />} />
           <Route path="/smart-home" element={<SmartHome />} />

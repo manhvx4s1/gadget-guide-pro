@@ -1,140 +1,19 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Edit, Plus, Save, X } from "lucide-react";
+import { Trash2, Edit, Plus, Settings, FileText } from "lucide-react";
 import { reviews, Review } from "@/data/reviews";
 
 const Admin = () => {
-  const [categories, setCategories] = useState(["Điện thoại", "Laptop", "Smart Home"]);
+  const navigate = useNavigate();
   const [reviewList, setReviewList] = useState<Review[]>(reviews);
-  const [isCreating, setIsCreating] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
-  const [editingCategoryIndex, setEditingCategoryIndex] = useState<number | null>(null);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    content: "",
-    productLink: "",
-    rating: 5
-  });
-
-  const handleCreateNew = () => {
-    setIsCreating(true);
-    setEditingId(null);
-    setFormData({
-      title: "",
-      description: "",
-      category: "",
-      content: "",
-      productLink: "",
-      rating: 5
-    });
-  };
-
-  const handleEdit = (review: Review) => {
-    setEditingId(review.id);
-    setIsCreating(false);
-    setFormData({
-      title: review.title,
-      description: review.description,
-      category: review.category,
-      content: review.content || "",
-      productLink: review.productLink || "",
-      rating: review.rating
-    });
-  };
-
-  const handleSave = () => {
-    if (isCreating) {
-      const newReview: Review = {
-        id: Date.now().toString(),
-        title: formData.title,
-        description: formData.description,
-        category: formData.category,
-        rating: formData.rating,
-        content: formData.content,
-        productLink: formData.productLink,
-        image: "/placeholder.svg",
-        views: "0",
-        likes: "0",
-        author: "Admin",
-        timeAgo: "Vừa tạo",
-        isFeatured: false
-      };
-      setReviewList([...reviewList, newReview]);
-    } else if (editingId) {
-      setReviewList(reviewList.map(review => 
-        review.id === editingId 
-          ? { ...review, ...formData }
-          : review
-      ));
-    }
-    handleCancel();
-  };
-
-  const handleCancel = () => {
-    setIsCreating(false);
-    setEditingId(null);
-    setFormData({
-      title: "",
-      description: "",
-      category: "",
-      content: "",
-      productLink: "",
-      rating: 5
-    });
-  };
 
   const handleDeleteReview = (id: string) => {
-    setReviewList(reviewList.filter(review => review.id !== id));
-  };
-
-  // Category management functions
-  const handleCreateCategory = () => {
-    setIsCreatingCategory(true);
-    setNewCategoryName("");
-  };
-
-  const handleEditCategory = (index: number) => {
-    setEditingCategoryIndex(index);
-    setNewCategoryName(categories[index]);
-  };
-
-  const handleSaveCategory = () => {
-    if (isCreatingCategory) {
-      setCategories([...categories, newCategoryName]);
-    } else if (editingCategoryIndex !== null) {
-      const updatedCategories = [...categories];
-      updatedCategories[editingCategoryIndex] = newCategoryName;
-      setCategories(updatedCategories);
+    if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+      setReviewList(reviewList.filter(review => review.id !== id));
     }
-    handleCancelCategory();
-  };
-
-  const handleCancelCategory = () => {
-    setIsCreatingCategory(false);
-    setEditingCategoryIndex(null);
-    setNewCategoryName("");
-  };
-
-  const handleDeleteCategory = (index: number) => {
-    const categoryToDelete = categories[index];
-    // Check if category is being used in reviews
-    const reviewsUsingCategory = reviewList.filter(review => review.category === categoryToDelete);
-    if (reviewsUsingCategory.length > 0) {
-      alert(`Không thể xóa danh mục "${categoryToDelete}" vì có ${reviewsUsingCategory.length} bài viết đang sử dụng.`);
-      return;
-    }
-    setCategories(categories.filter((_, i) => i !== index));
   };
 
   return (
@@ -158,252 +37,163 @@ const Admin = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="articles" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="articles">Quản lý bài viết</TabsTrigger>
-            <TabsTrigger value="categories">Quản lý danh mục</TabsTrigger>
-          </TabsList>
+        <div className="grid gap-6">
+          {/* Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Tổng bài viết</CardTitle>
+                <FileText className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{reviewList.length}</div>
+                <p className="text-xs text-muted-foreground">
+                  Bài viết review sản phẩm
+                </p>
+              </CardContent>
+            </Card>
 
-          {/* Quản lý bài viết */}
-          <TabsContent value="articles" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold">Bài viết ({reviewList.length})</h2>
-              <Button onClick={handleCreateNew} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Tạo bài viết mới
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Danh mục</CardTitle>
+                <Settings className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">3</div>
+                <p className="text-xs text-muted-foreground">
+                  Danh mục sản phẩm
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Lượt xem</CardTitle>
+                <Badge variant="secondary">👁</Badge>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {reviewList.reduce((total, review) => total + parseInt(review.views), 0)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Tổng lượt xem
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Hành động nhanh</CardTitle>
+              <CardDescription>
+                Quản lý nội dung và cấu hình hệ thống
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Button 
+                onClick={() => navigate("/admin/article-editor")}
+                className="gap-2 h-16"
+                size="lg"
+              >
+                <Plus className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-semibold">Tạo bài viết mới</div>
+                  <div className="text-sm opacity-90">Viết review sản phẩm</div>
+                </div>
               </Button>
-            </div>
 
-            {/* Form tạo/sửa bài viết */}
-            {(isCreating || editingId) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    {isCreating ? "Tạo bài viết mới" : "Chỉnh sửa bài viết"}
-                  </CardTitle>
-                  <CardDescription>
-                    Điền thông tin chi tiết cho bài viết review
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Tiêu đề</Label>
-                      <Input
-                        id="title"
-                        value={formData.title}
-                        onChange={(e) => setFormData({...formData, title: e.target.value})}
-                        placeholder="Nhập tiêu đề bài viết"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Danh mục</Label>
-                      <Select 
-                        value={formData.category} 
-                        onValueChange={(value) => setFormData({...formData, category: value})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Chọn danh mục" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map(category => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Mô tả</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      placeholder="Nhập mô tả ngắn cho bài viết"
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="productLink">Link sản phẩm</Label>
-                      <Input
-                        id="productLink"
-                        value={formData.productLink}
-                        onChange={(e) => setFormData({...formData, productLink: e.target.value})}
-                        placeholder="https://..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="rating">Đánh giá (1-5)</Label>
-                      <Input
-                        id="rating"
-                        type="number"
-                        min="1"
-                        max="5"
-                        step="0.1"
-                        value={formData.rating}
-                        onChange={(e) => setFormData({...formData, rating: parseFloat(e.target.value)})}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="content">Nội dung</Label>
-                    <Textarea
-                      id="content"
-                      value={formData.content}
-                      onChange={(e) => setFormData({...formData, content: e.target.value})}
-                      placeholder="Nhập nội dung chi tiết bài viết (hỗ trợ HTML)"
-                      rows={8}
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button onClick={handleSave} className="gap-2">
-                      <Save className="h-4 w-4" />
-                      Lưu
-                    </Button>
-                    <Button onClick={handleCancel} variant="outline" className="gap-2">
-                      <X className="h-4 w-4" />
-                      Hủy
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Danh sách bài viết */}
-            <div className="grid gap-4">
-              {reviewList.map((review) => (
-                <Card key={review.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-lg">{review.title}</h3>
-                          <Badge variant="secondary">{review.category}</Badge>
-                          {review.isFeatured && <Badge variant="default">Nổi bật</Badge>}
-                        </div>
-                        <p className="text-muted-foreground mb-2">{review.description}</p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>⭐ {review.rating}</span>
-                          <span>👁 {review.views}</span>
-                          <span>❤️ {review.likes}</span>
-                          <span>✍️ {review.author}</span>
-                          <span>🕒 {review.timeAgo}</span>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => handleEdit(review)}
-                          variant="outline"
-                          size="sm"
-                          className="gap-2"
-                        >
-                          <Edit className="h-4 w-4" />
-                          Sửa
-                        </Button>
-                        <Button
-                          onClick={() => handleDeleteReview(review.id)}
-                          variant="destructive"
-                          size="sm"
-                          className="gap-2"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Xóa
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Quản lý danh mục */}
-          <TabsContent value="categories" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold">Danh mục sản phẩm</h2>
-              <Button onClick={handleCreateCategory} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Thêm danh mục
+              <Button 
+                onClick={() => navigate("/admin/categories")}
+                variant="outline"
+                className="gap-2 h-16"
+                size="lg"
+              >
+                <Settings className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-semibold">Quản lý danh mục</div>
+                  <div className="text-sm opacity-70">Thêm, sửa, xóa danh mục</div>
+                </div>
               </Button>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Form tạo/sửa danh mục */}
-            {(isCreatingCategory || editingCategoryIndex !== null) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    {isCreatingCategory ? "Thêm danh mục mới" : "Chỉnh sửa danh mục"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="categoryName">Tên danh mục</Label>
-                    <Input
-                      id="categoryName"
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      placeholder="Nhập tên danh mục"
-                    />
+          {/* Recent Articles */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Bài viết gần đây</CardTitle>
+              <CardDescription>
+                {reviewList.length} bài viết review sản phẩm
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {reviewList.slice(0, 5).map((review) => (
+                <div key={review.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-semibold">{review.title}</h3>
+                      <Badge variant="secondary">{review.category}</Badge>
+                      {review.isFeatured && <Badge variant="default">Nổi bật</Badge>}
+                    </div>
+                    <p className="text-muted-foreground text-sm mb-2">{review.description}</p>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span>⭐ {review.rating}</span>
+                      <span>👁 {review.views}</span>
+                      <span>❤️ {review.likes}</span>
+                      <span>✍️ {review.author}</span>
+                      <span>🕒 {review.timeAgo}</span>
+                    </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button onClick={handleSaveCategory} className="gap-2">
-                      <Save className="h-4 w-4" />
-                      Lưu
+                    <Button
+                      onClick={() => navigate(`/admin/article-editor/${review.id}`)}
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Sửa
                     </Button>
-                    <Button onClick={handleCancelCategory} variant="outline" className="gap-2">
-                      <X className="h-4 w-4" />
-                      Hủy
+                    <Button
+                      onClick={() => handleDeleteReview(review.id)}
+                      variant="destructive"
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Xóa
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            )}
-
-            <div className="grid gap-4">
-              {categories.map((category, index) => (
-                <Card key={index}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg">{category}</h3>
-                        <p className="text-muted-foreground">
-                          {reviewList.filter(r => r.category === category).length} bài viết
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          onClick={() => handleEditCategory(index)}
-                          variant="outline" 
-                          size="sm" 
-                          className="gap-2"
-                        >
-                          <Edit className="h-4 w-4" />
-                          Sửa
-                        </Button>
-                        <Button 
-                          onClick={() => handleDeleteCategory(index)}
-                          variant="destructive" 
-                          size="sm" 
-                          className="gap-2"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Xóa
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                </div>
               ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+
+              {reviewList.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Chưa có bài viết nào</p>
+                  <Button 
+                    onClick={() => navigate("/admin/article-editor")}
+                    className="mt-4 gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Tạo bài viết đầu tiên
+                  </Button>
+                </div>
+              )}
+
+              {reviewList.length > 5 && (
+                <div className="text-center pt-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate("/admin/article-editor")}
+                  >
+                    Xem tất cả bài viết
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
