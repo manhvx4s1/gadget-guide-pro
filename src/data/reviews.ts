@@ -16,6 +16,8 @@ export interface Review {
   isFeatured?: boolean;
   productLink?: string;
   content?: string;
+  videoUrl?: string;
+  tags?: string[];
 }
 
 export const reviews: Review[] = [
@@ -32,6 +34,8 @@ export const reviews: Review[] = [
     timeAgo: "2 ngày trước",
     isFeatured: true,
     productLink: "https://www.thegioididong.com/dtdd/iphone-15-pro-max",
+    videoUrl: "https://www.youtube.com/embed/XHTrLYShBRQ",
+    tags: ["iPhone", "Apple", "Smartphone", "Premium", "Camera"],
     content: `
       <h2>Thiết kế và Chất liệu</h2>
       <p>iPhone 15 Pro Max mang đến thiết kế titanium cao cấp với trọng lượng nhẹ hơn đáng kể so với thế hệ trước...</p>
@@ -56,6 +60,8 @@ export const reviews: Review[] = [
     timeAgo: "5 ngày trước",
     isFeatured: false,
     productLink: "https://www.thegioididong.com/laptop/macbook-pro-14-m3",
+    videoUrl: "https://www.youtube.com/embed/mtHoOvONFyM",
+    tags: ["MacBook", "Apple", "M3", "Professional", "Creative"],
     content: `
       <h2>Hiệu năng M3 Chip</h2>
       <p>Chip M3 mang lại hiệu năng vượt trội với khả năng xử lý đa nhiệm mượt mà...</p>
@@ -139,4 +145,17 @@ export const getReviewsByCategory = (category: string): Review[] => {
 
 export const getFeaturedReviews = (): Review[] => {
   return reviews.filter(review => review.isFeatured);
+};
+
+export const searchReviews = (query: string): Review[] => {
+  if (!query.trim()) return [];
+  
+  const searchTerm = query.toLowerCase().trim();
+  return reviews.filter(review => 
+    review.title.toLowerCase().includes(searchTerm) ||
+    review.description.toLowerCase().includes(searchTerm) ||
+    review.category.toLowerCase().includes(searchTerm) ||
+    review.author.toLowerCase().includes(searchTerm) ||
+    review.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
+  );
 };

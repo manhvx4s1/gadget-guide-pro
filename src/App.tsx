@@ -8,6 +8,7 @@ import ReviewDetail from "./pages/ReviewDetail";
 import Admin from "./pages/Admin";
 import ArticleEditor from "./pages/ArticleEditor";
 import CategoryManager from "./pages/CategoryManager";
+import SearchResults from "./pages/SearchResults";
 import Phones from "./pages/Phones";
 import Laptops from "./pages/Laptops";
 import SmartHome from "./pages/SmartHome";
@@ -27,12 +28,13 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/article-editor" element={<ArticleEditor />} />
           <Route path="/admin/article-editor/:id" element={<ArticleEditor />} />
-          <Route path="/admin/categories" element={<CategoryManager />} />
-          <Route path="/phones" element={<Phones />} />
-          <Route path="/laptops" element={<Laptops />} />
-          <Route path="/smart-home" element={<SmartHome />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+            <Route path="/admin/categories" element={<CategoryManager />} />
+            <Route path="/phones" element={<Phones />} />
+            <Route path="/laptops" element={<Laptops />} />
+            <Route path="/smart-home" element={<SmartHome />} />
+            <Route path="/search" element={<SearchResults />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
