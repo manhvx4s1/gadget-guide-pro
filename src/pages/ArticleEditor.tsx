@@ -1,258 +1,197 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, X } from "lucide-react";
-import { reviews, Review } from "@/data/reviews";
-import { FileUpload } from "@/components/FileUpload";
-import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import '../styles/quill-theme.css';
+import Header from "@/components/Header";
 
 const ArticleEditor = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const isEditing = Boolean(id);
-  
-  const [categories] = useState(["Điện thoại", "Laptop", "Smart Home"]);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    content: "",
-    productLink: "",
-    rating: 5,
-    image: "",
-    videoUrl: ""
-  });
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [category, setCategory] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [currentTag, setCurrentTag] = useState("");
 
-  useEffect(() => {
-    if (isEditing && id) {
-      const review = reviews.find(r => r.id === id);
-      if (review) {
-        setFormData({
-          title: review.title,
-          description: review.description,
-          category: review.category,
-          content: review.content || "",
-          productLink: review.productLink || "",
-          rating: review.rating,
-          image: review.image || "",
-          videoUrl: ""
-        });
-      }
-    }
-  }, [isEditing, id]);
+  const categories = ["Điện thoại", "Laptop", "Smart Home"];
 
-  const handleSave = () => {
-    if (!formData.title.trim()) {
-      toast.error("Vui lòng nhập tiêu đề bài viết");
-      return;
+  const handleAddTag = () => {
+    if (currentTag.trim() && !tags.includes(currentTag.trim())) {
+      setTags([...tags, currentTag.trim()]);
+      setCurrentTag("");
     }
-    if (!formData.category) {
-      toast.error("Vui lòng chọn danh mục");
-      return;
-    }
-    if (!formData.description.trim()) {
-      toast.error("Vui lòng nhập mô tả");
-      return;
-    }
-
-    // Simulate saving logic
-    if (isEditing) {
-      toast.success("Đã cập nhật bài viết thành công!");
-    } else {
-      toast.success("Đã tạo bài viết mới thành công!");
-    }
-    
-    navigate("/admin");
   };
 
-  const handleCancel = () => {
-    navigate("/admin");
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleImageUploaded = (url: string) => {
-    setFormData(prev => ({ ...prev, image: url }));
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTag();
+    }
   };
 
-  const handleVideoUploaded = (url: string) => {
-    setFormData(prev => ({ ...prev, videoUrl: url }));
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Lưu bài viết
+    console.log({ title, content, category, tags });
   };
+
+  // Rich text editor configuration
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ['blockquote', 'code-block'],
+      [{ 'align': [] }],
+      ['link', 'image', 'video'],
+      [{ 'color': [] }, { 'background': [] }],
+      ['clean']
+    ],
+  };
+
+  const formats = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'blockquote', 'code-block',
+    'align', 'link', 'image', 'video', 'color', 'background'
+  ];
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-4">
-            <Button 
-              onClick={handleCancel}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Quay lại
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                {isEditing ? "Chỉnh sửa bài viết" : "Tạo bài viết mới"}
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                {isEditing ? "Cập nhật thông tin bài viết" : "Tạo bài viết review mới"}
-              </p>
+      <Header />
+      
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/admin")}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Quay lại
+          </Button>
+          <h1 className="text-3xl font-bold text-foreground">Thêm bài viết</h1>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title */}
+          <div className="space-y-2">
+            <Input
+              type="text"
+              placeholder="Nhập tiêu đề tại đây"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="text-lg font-medium h-12"
+              required
+            />
+          </div>
+
+          {/* Category & Tags Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Category */}
+            <div className="space-y-2">
+              <Label htmlFor="category">Danh mục</Label>
+              <Select value={category} onValueChange={setCategory} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn danh mục" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Tags */}
+            <div className="space-y-2">
+              <Label htmlFor="tags">Thẻ tag</Label>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Nhập tag..."
+                    value={currentTag}
+                    onChange={(e) => setCurrentTag(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleAddTag}
+                    variant="outline"
+                    size="icon"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                {/* Display tags */}
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, index) => (
+                      <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                        {tag}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto p-0 hover:bg-transparent"
+                          onClick={() => handleRemoveTag(tag)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {isEditing ? "Chỉnh sửa bài viết" : "Thông tin bài viết"}
-            </CardTitle>
-            <CardDescription>
-              Điền thông tin chi tiết cho bài viết review
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Tiêu đề *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  placeholder="Nhập tiêu đề bài viết"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="category">Danh mục *</Label>
-                <Select 
-                  value={formData.category} 
-                  onValueChange={(value) => setFormData({...formData, category: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Chọn danh mục" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(category => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Mô tả *</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Nhập mô tả ngắn cho bài viết"
-                rows={3}
+          {/* Rich Text Editor */}
+          <div className="space-y-2">
+            <Label>Nội dung bài viết</Label>
+            <div className="bg-card border border-border rounded-lg overflow-hidden">
+              <ReactQuill
+                theme="snow"
+                value={content}
+                onChange={setContent}
+                modules={modules}
+                formats={formats}
+                placeholder="Viết nội dung bài viết tại đây..."
+                style={{ minHeight: '400px' }}
               />
             </div>
+          </div>
 
-            {/* Media Upload */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FileUpload
-                onFileUploaded={handleImageUploaded}
-                acceptedTypes="image"
-                className="space-y-2"
-              />
-              
-              <FileUpload
-                onFileUploaded={handleVideoUploaded}
-                acceptedTypes="video"
-                className="space-y-2"
-              />
-            </div>
-
-            {/* Additional Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="productLink">Link sản phẩm</Label>
-                <Input
-                  id="productLink"
-                  value={formData.productLink}
-                  onChange={(e) => setFormData({...formData, productLink: e.target.value})}
-                  placeholder="https://..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="rating">Đánh giá (1-5)</Label>
-                <Input
-                  id="rating"
-                  type="number"
-                  min="1"
-                  max="5"
-                  step="0.1"
-                  value={formData.rating}
-                  onChange={(e) => setFormData({...formData, rating: parseFloat(e.target.value)})}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="content">Nội dung</Label>
-              <Textarea
-                id="content"
-                value={formData.content}
-                onChange={(e) => setFormData({...formData, content: e.target.value})}
-                placeholder="Nhập nội dung chi tiết bài viết (hỗ trợ HTML)"
-                rows={10}
-              />
-            </div>
-
-            {/* Preview sections */}
-            {formData.image && (
-              <div className="space-y-2">
-                <Label>Ảnh đã tải lên</Label>
-                <div className="border rounded-md p-4">
-                  <img 
-                    src={formData.image} 
-                    alt="Article preview" 
-                    className="max-w-md max-h-64 object-cover rounded-md"
-                  />
-                </div>
-              </div>
-            )}
-
-            {formData.videoUrl && (
-              <div className="space-y-2">
-                <Label>Video đã tải lên</Label>
-                <div className="border rounded-md p-4">
-                  <video 
-                    src={formData.videoUrl} 
-                    controls 
-                    className="max-w-md max-h-64 rounded-md"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 pt-4">
-              <Button onClick={handleSave} className="gap-2">
-                <Save className="h-4 w-4" />
-                {isEditing ? "Cập nhật" : "Tạo bài viết"}
-              </Button>
-              <Button onClick={handleCancel} variant="outline" className="gap-2">
-                <X className="h-4 w-4" />
-                Hủy
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-4 pt-6">
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={() => navigate("/admin")}
+            >
+              Hủy
+            </Button>
+            <Button type="submit">
+              Xuất bản
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

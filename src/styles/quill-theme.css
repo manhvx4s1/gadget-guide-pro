@@ -1,0 +1,56 @@
+/* Custom styles for React Quill editor */
+.ql-editor {
+  min-height: 400px !important;
+  font-size: 16px;
+  line-height: 1.6;
+  color: hsl(var(--foreground));
+}
+
+.ql-toolbar {
+  border-top: 1px solid hsl(var(--border)) !important;
+  border-left: 1px solid hsl(var(--border)) !important;
+  border-right: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--card)) !important;
+}
+
+.ql-container {
+  border-left: 1px solid hsl(var(--border)) !important;
+  border-right: 1px solid hsl(var(--border)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--card)) !important;
+}
+
+.ql-toolbar .ql-stroke {
+  stroke: hsl(var(--foreground)) !important;
+}
+
+.ql-toolbar .ql-fill {
+  fill: hsl(var(--foreground)) !important;
+}
+
+.ql-toolbar button:hover {
+  background: hsl(var(--accent)) !important;
+}
+
+.ql-toolbar button.ql-active {
+  background: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.ql-picker-label {
+  color: hsl(var(--foreground)) !important;
+}
+
+.ql-picker-options {
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+.ql-picker-item:hover {
+  background: hsl(var(--accent)) !important;
+}
+
+.ql-editor.ql-blank::before {
+  color: hsl(var(--muted-foreground)) !important;
+  font-style: normal !important;
+}

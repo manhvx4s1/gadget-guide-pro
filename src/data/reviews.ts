@@ -83,6 +83,7 @@ export const reviews: Review[] = [
     timeAgo: "1 tuần trước",
     isFeatured: false,
     productLink: "https://www.amazon.com/echo-dot-5th-gen",
+    tags: ["Amazon", "Echo", "Smart Speaker", "Alexa", "Smart Home"],
     content: `
       <h2>Thiết kế và Chất lượng</h2>
       <p>Echo Dot gen 5 có thiết kế tròn đặc trưng với chất liệu vải cao cấp...</p>
@@ -103,7 +104,8 @@ export const reviews: Review[] = [
     author: "Mobile Expert",
     timeAgo: "3 ngày trước",
     isFeatured: true,
-    productLink: "https://www.thegioididong.com/dtdd/samsung-galaxy-s24-ultra"
+    productLink: "https://www.thegioididong.com/dtdd/samsung-galaxy-s24-ultra",
+    tags: ["Samsung", "Galaxy S24", "Android", "Flagship", "Camera"]
   },
   {
     id: "5",
@@ -117,7 +119,8 @@ export const reviews: Review[] = [
     author: "Gaming Guru",
     timeAgo: "4 ngày trước",
     isFeatured: false,
-    productLink: "https://www.thegioididong.com/laptop-gaming"
+    productLink: "https://www.thegioididong.com/laptop-gaming",
+    tags: ["Gaming", "RTX 4070", "Laptop", "Performance", "2024"]
   },
   {
     id: "6",
@@ -131,7 +134,8 @@ export const reviews: Review[] = [
     author: "Home Tech",
     timeAgo: "6 ngày trước",
     isFeatured: false,
-    productLink: "https://www.philips-hue.com"
+    productLink: "https://www.philips-hue.com",
+    tags: ["Philips", "Hue", "Smart Light", "IoT", "Home Automation"]
   }
 ];
 
