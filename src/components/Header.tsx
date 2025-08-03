@@ -60,6 +60,16 @@ const Header = () => {
             >
               Quản trị
             </a>
+            <a
+              href="/auth"
+              className="text-foreground hover:text-primary transition-colors font-medium"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = "/auth";
+              }}
+            >
+              Đăng nhập
+            </a>
           </nav>
 
           {/* Search Bar */}
@@ -115,6 +125,17 @@ const Header = () => {
                 }}
               >
                 Quản trị
+              </a>
+              <a
+                href="/auth"
+                className="text-foreground hover:text-primary transition-colors font-medium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsMenuOpen(false);
+                  window.location.href = "/auth";
+                }}
+              >
+                Đăng nhập
               </a>
             </nav>
             
