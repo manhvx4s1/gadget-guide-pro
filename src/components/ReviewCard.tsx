@@ -58,6 +58,22 @@ const ReviewCard = ({ review }: ReviewCardProps) => {
           {description}
         </p>
 
+        {/* Tags */}
+        {review.tags && review.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {review.tags.slice(0, 3).map((tag, index) => (
+              <Badge key={index} variant="outline" className="text-xs px-2 py-1">
+                {tag}
+              </Badge>
+            ))}
+            {review.tags.length > 3 && (
+              <Badge variant="outline" className="text-xs px-2 py-1">
+                +{review.tags.length - 3}
+              </Badge>
+            )}
+          </div>
+        )}
+
         {/* Stats */}
         <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
