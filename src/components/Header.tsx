@@ -1,13 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Get current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,6 +32,11 @@ const Header = () => {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setIsMenuOpen(false);
     }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setIsMenuOpen(false);
   };
 
   const categories = [
@@ -60,16 +82,34 @@ const Header = () => {
             >
               Quản trị
             </a>
-            <a
-              href="/auth"
-              className="text-foreground hover:text-primary transition-colors font-medium"
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.href = "/auth";
-              }}
-            >
-              Đăng nhập
-            </a>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-foreground">
+                  <User className="h-4 w-4" />
+                  <span className="font-medium">{user.email}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="text-foreground hover:text-primary"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Đăng xuất
+                </Button>
+              </div>
+            ) : (
+              <a
+                href="/auth"
+                className="text-foreground hover:text-primary transition-colors font-medium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "/auth";
+                }}
+              >
+                Đăng nhập
+              </a>
+            )}
           </nav>
 
           {/* Search Bar */}
@@ -126,17 +166,35 @@ const Header = () => {
               >
                 Quản trị
               </a>
-              <a
-                href="/auth"
-                className="text-foreground hover:text-primary transition-colors font-medium"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsMenuOpen(false);
-                  window.location.href = "/auth";
-                }}
-              >
-                Đăng nhập
-              </a>
+              {user ? (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-foreground">
+                    <User className="h-4 w-4" />
+                    <span className="font-medium">{user.email}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleSignOut}
+                    className="text-foreground hover:text-primary w-full justify-start"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Đăng xuất
+                  </Button>
+                </div>
+              ) : (
+                <a
+                  href="/auth"
+                  className="text-foreground hover:text-primary transition-colors font-medium"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsMenuOpen(false);
+                    window.location.href = "/auth";
+                  }}
+                >
+                  Đăng nhập
+                </a>
+              )}
             </nav>
             
             {/* Mobile Search */}
