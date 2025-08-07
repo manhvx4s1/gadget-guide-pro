@@ -12,7 +12,8 @@ import SearchResults from "./pages/SearchResults";
 import Phones from "./pages/Phones";
 import Laptops from "./pages/Laptops";
 import SmartHome from "./pages/SmartHome";
-import Auth from "./pages/Auth";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,7 +35,8 @@ const App = () => (
             <Route path="/laptops" element={<Laptops />} />
             <Route path="/smart-home" element={<SmartHome />} />
             <Route path="/search" element={<SearchResults />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
         </Routes>

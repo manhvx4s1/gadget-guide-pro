@@ -100,11 +100,11 @@ const Header = () => {
               </div>
             ) : (
               <a
-                href="/auth"
+                href="/login"
                 className="text-foreground hover:text-primary transition-colors font-medium"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = "/auth";
+                  window.location.href = "/login";
                 }}
               >
                 Đăng nhập
@@ -184,12 +184,12 @@ const Header = () => {
                 </div>
               ) : (
                 <a
-                  href="/auth"
+                  href="/login"
                   className="text-foreground hover:text-primary transition-colors font-medium"
                   onClick={(e) => {
                     e.preventDefault();
                     setIsMenuOpen(false);
-                    window.location.href = "/auth";
+                    window.location.href = "/login";
                   }}
                 >
                   Đăng nhập
